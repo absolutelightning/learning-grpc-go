@@ -35,6 +35,25 @@ func (s *Server) PrimeFactors(req *pb.PrimeFactorsRequest, stream pb.CalculatorS
 	return nil
 }
 
+func (s *Server) Max(stream pb.CalculatorService_MaxServer) error {
+	log.Println("Max function was invoked")
+	var max int32
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			log.Fatalf("Error when reading client stream: %v", err)
+		}
+		if req.Number > max {
+			max = req.Number
+			stream.SendMsg(&pb.MaxResponse{Result: max})
+		}
+	}
+	return nil
+}
+
 func (s *Server) Average(stream pb.CalculatorService_AverageServer) error {
 	log.Println("Average function was invoked")
 	var sum int32

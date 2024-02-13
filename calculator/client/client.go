@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"io"
 	"log"
+	"time"
 
 	pb "github.com/absolutelightning/learning-grpc-go/calculator/proto"
 )
@@ -22,9 +23,46 @@ func main() {
 
 	c := pb.NewCalculatorServiceClient(conn)
 
-	doAverage(c)
+	doMax(c)
 
 	defer conn.Close()
+}
+
+func doMax(c pb.CalculatorServiceClient) {
+	stream, err := c.Max(context.Background())
+	if err != nil {
+		log.Fatalf("Failed to call Max: %v", err)
+	}
+	go func() {
+		for i := 0; i < 5; i++ {
+			fmt.Println("Enter number")
+			var num int32
+			fmt.Scanf("%d", &num)
+			err := stream.Send(&pb.MaxRequest{Number: num})
+			if err != nil {
+				log.Fatalf("Failed to send number: %v", err)
+			}
+			time.Sleep(1 * time.Second)
+		}
+		stream.CloseSend()
+	}()
+
+	waitc := make(chan struct{})
+
+	go func() {
+		for {
+			res, err := stream.Recv()
+			if err == io.EOF {
+				close(waitc)
+				break
+			}
+			if err != nil {
+				log.Fatalf("Failed to receive response: %v", err)
+			}
+			fmt.Println("Max result =", res.Result)
+		}
+	}()
+	<-waitc
 }
 
 func doAverage(c pb.CalculatorServiceClient) {
