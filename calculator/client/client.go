@@ -27,7 +27,10 @@ func main() {
 		fmt.Scanf("%d", &a)
 		fmt.Println("Enter second number")
 		fmt.Scanf("%d", &b)
-		res, _ := c.Sum(context.Background(), &pb.SumRequest{A: a, B: b})
+		res, err := c.Sum(context.Background(), &pb.SumRequest{A: a, B: b})
+		if err != nil {
+			log.Fatalf("Failed to call Sum: %v", err)
+		}
 		fmt.Println("Sum result =", res.Result)
 	}
 
