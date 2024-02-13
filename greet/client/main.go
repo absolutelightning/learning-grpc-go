@@ -19,7 +19,7 @@ func main() {
 
 	c := pb.NewGreetServiceClient(conn)
 
-	doGreetManyTimes(c)
+	doGreetEveryOne(c)
 
 	defer conn.Close()
 }
