@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = "github.com/absolutelightning/learning-grpc-go/calculator/proto";
+
+message SumRequest {
+  int32 a = 1;
+  int32 b = 2;
+}
+
+message SumResponse {
+  int32 result = 1;
+}
+
+service CalculatorService {
+  rpc Sum(SumRequest) returns (SumResponse);
+}
